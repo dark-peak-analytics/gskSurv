@@ -3,6 +3,10 @@
 # Changed significantly
 on:
   push:
+    branches: [dev, master]
+  pull_request:
+    branches: [dev, master]
+  push:
     paths: ['README.Rmd'] # Only runs when the README changes
 
 name: render-readme.yaml
