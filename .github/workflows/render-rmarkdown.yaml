@@ -25,9 +25,23 @@ jobs:
 
       - uses: r-lib/actions/setup-r@v2
         with:
-          r-version: renv
+          r-version: release # CHANGED: 'release' instead of 'renv'
 
-      - uses: r-lib/actions/setup-renv@v2
+      # --- Updates to the original workflow ---
+      - name: Install dependencies
+        run: |
+          # 1. Install tools needed for the logic below
+          install.packages(c("remotes", "rmarkdown"))
+
+          # 2. Install dependencies listed in your package DESCRIPTION file
+          # This ensures the package itself works.
+          remotes::install_deps(dependencies = TRUE)
+
+          # 3. (Optional) Install packages used in README.Rmd but NOT in DESCRIPTION
+          # If your README uses extra packages for plots (e.g. ggplot2), add them here:
+          # install.packages("ggplot2")
+        shell: Rscript {0}
+      # --- End of updates to the original workflow ---
 
       - name: Render Rmarkdown files and Commit Results
         run: |
