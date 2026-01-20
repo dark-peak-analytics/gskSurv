@@ -1,0 +1,22 @@
+Package: gskSurv
+Title: What the Package Does (One Line, Title Case)
+Version: 0.0.0.9000
+Authors@R: c(
+    person(given = "Robert", family = "Smith", 
+          email = "rsmith@darkpeakanalytics.com", 
+          role = c("ctb"), 
+          comment = c(ORCID = "0000-0003-0245-3217")),
+   person(given = "Carina", family = "Behr", 
+          email = "cbehr@darkpeakanalytics.com ", 
+          role = c("aut", "cre"), 
+          comment = c(ORCID = "0000-0001-6094-807X")),
+    person(given = "Wael", family = "Mohammed",
+          email = "wmohammed@darkpeakanalytics.com",
+          role = c("ctb"),
+          comment = c(ORCID = "0000-0003-0370-4903")))
+Description: What the package does (one paragraph).
+License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
+    license
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.3
