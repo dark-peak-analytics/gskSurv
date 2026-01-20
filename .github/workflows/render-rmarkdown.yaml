@@ -1,15 +1,16 @@
 # Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
+# Changed significantly
 on:
   push:
-    paths: ['**.Rmd']
+    paths: ['README.Rmd'] # Only runs when the README changes
 
-name: render-rmarkdown.yaml
+name: render-readme.yaml
 
 permissions: read-all
 
 jobs:
-  render-rmarkdown:
+  render-readme:
     runs-on: ubuntu-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
@@ -25,29 +26,30 @@ jobs:
 
       - uses: r-lib/actions/setup-r@v2
         with:
-          r-version: release # CHANGED: 'release' instead of 'renv'
+          r-version: release
 
-      # --- Updates to the original workflow ---
       - name: Install dependencies
         run: |
-          # 1. Install tools needed for the logic below
-          install.packages(c("remotes", "rmarkdown"))
+          # 1. Install devtools (includes rmarkdown) and remotes
+          install.packages(c("remotes", "devtools"))
 
-          # 2. Install dependencies listed in your package DESCRIPTION file
-          # This ensures the package itself works.
+          # 2. Install dependencies listed in DESCRIPTION
+          # Essential so devtools can load your package to document it
           remotes::install_deps(dependencies = TRUE)
-
-          # 3. (Optional) Install packages used in README.Rmd but NOT in DESCRIPTION
-          # If your README uses extra packages for plots (e.g. ggplot2), add them here:
-          # install.packages("ggplot2")
         shell: Rscript {0}
-      # --- End of updates to the original workflow ---
 
-      - name: Render Rmarkdown files and Commit Results
+      - name: Render README.Rmd and Commit Results
         run: |
-          RMD_PATH=($(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '[.]Rmd$'))
-          Rscript -e 'for (f in commandArgs(TRUE)) if (file.exists(f)) rmarkdown::render(f)' ${RMD_PATH[*]}
+          # Render using devtools
+          # This ensures 'library(YourPackage)' works inside the Rmd
+          Rscript -e 'devtools::build_readme()'
+
+          # Configure Git
           git config --local user.name "$GITHUB_ACTOR"
           git config --local user.email "$GITHUB_ACTOR@users.noreply.github.com"
-          git commit ${RMD_PATH[*]/.Rmd/.md} -m 'Re-build Rmarkdown files' || echo "No changes to commit"
+
+          # Commit the changes (README.md)
+          # Note: build_readme() might update man/ figures too if generated
+          git add README.md man/
+          git commit -m 'Re-build README.Rmd via devtools' || echo "No changes to commit"
           git push origin || echo "No changes to commit"
